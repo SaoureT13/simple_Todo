@@ -1,0 +1,103 @@
+{% extends 'todo/_base.html' %}
+
+{% block content %}
+    <div class="min-h-screen bg-background">
+        <header class="w-full font-Mochyi bg-white">
+            <nav class="w-full">
+                <div class="lg:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-16">
+                        <p class="logo"><a href="" class="py-4 block">Teddy x Todo</a></p>
+
+                        <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                            <a href=""
+                               class="inline-flex mr-6 items-center leading-5 py-5 border-b-2 border-transparent
+                               hover:border-checkbox transition duration-150 ease-in-out">Dashboard</a>
+                            <a href=""
+                               class="inline-flex mr-6 items-center leading-5 py-5 border-b-2 border-transparent
+                               hover:border-checkbox transition duration-150 ease-in-out">Todo</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            <div class="relative max-w-2xl mx-auto px-4 mt-10">
+                <div class="search">
+                    <form hx-get="{% url 'todo:search_task' %}"
+                          hx-target="#task-container" hx-swap="innerHTML"
+                          class="w-full py-3 px-4 bg-white rounded-md flex focus-within:border-gray-300 focus-within:border-2
+                            border-2 border-transparent transition duration-150 ease-in-out">
+                        <input type="text" name="search" placeholder="Search by title..."
+                               hx-get="{% url 'todo:search_task' %}"
+                               hx-trigger="keyup changed delay:500ms"
+                               hx-target="#task-container"
+                               hx-swap="innerHTML"
+                               class="w-full border-0 p-0 text-lg outline-none font-Mochyi text-gray-400
+                               focus:outline-2 focus:border-0 focus:ring-0  placeholder-gray-400">
+                        <button class="bg-gray-400 px-3 rounded-md hover:bg-gray-300 transition duration-150 ease-in-out text-white">
+                            <i class="ri-search-line"></i>
+                        </button>
+                    </form>
+                </div>
+                <div class="mt-6">
+                    <form hx-post="{% url 'todo:create_task' %}"
+                          hx-target="#task-container"
+                          hx-swap="beforeend"
+                          hx-on="htmx:afterRequest: if(event.detail.successful) this.reset();"
+                          class="w-full font-Mochyi text-gray-400">
+                        {% csrf_token %}
+                        <label for="id_for_title" class="hidden">Task</label>
+                        <textarea name="title" id="id_for_title" placeholder="Create your task"
+                                  class="w-full min-h-16 resize-none rounded-md placeholder-gray-400 focus:ring-0
+                                  focus:border-gray-300 focus:border-2
+                                border-2 border-transparent transition duration-150 ease-in-out
+                        "></textarea>
+                        <button type="submit"
+                                class="mt-4 bg-button px-4 py-2 rounded-md text-white uppercase hover:opacity-70 transition duration-150 ease-in-out">
+                            Create
+                        </button>
+                    </form>
+                </div>
+
+                <div id="todo-stat" class="w-full mx-auto flex justify-between mt-16">
+                    <div class="w-[100px] bg-white rounded-md p-2 text-center flex flex-col"><p
+                            class="text-2xl font-Mochyi font-bold">
+                        {{ tasks.count }}</p>
+                        <p class="text-[12px] font-Mochyi mt-auto">Tasks</p></div>
+                    <div class="w-[100px] bg-white rounded-md p-2 text-center text-green-500 flex flex-col"><p
+                            class="text-2xl font-Mochyi font-bold">
+                        {{ tasks_completed.count }}</p>
+                        <p class="text-[12px] font-Mochyi mt-auto">Tasks completed</p></div>
+                    <div class="w-[100px] bg-white rounded-md p-2 text-center text-red-500 flex flex-col"><p
+                            class="text-2xl font-Mochyi font-bold">
+                        {{ tasks_not_completed.count }}</p>
+                        <p class="text-[12px] font-Mochyi mt-auto">Task To do</p></div>
+                </div>
+
+                <div id="task-container" class="mt-6">
+                    {% for task in tasks %}
+                        {% include 'todo/partials/task.html' %}
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+{% endblock %}
+
+{% block script %}
+
+    document.body.addEventListener('click', (e)=>{
+    if(e.target.classList.contains('completed-task')){
+    let taskId = e.target.dataset.task_id
+
+    htmx.ajax('POST', `/completed_task/${taskId}/`, {
+    headers: {
+    "X-CSRFToken": "{{ csrf_token }}"
+    },
+    target: `.todo-${taskId}`,
+    swap: 'outerHTML'
+    })
+    }
+    })
+{% endblock %}

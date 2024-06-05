@@ -1,0 +1,6 @@
+<div id="task-container" class="mt-6" hx-swap-oob="outerHTML">
+    {% for task in tasks %}
+        {% include 'todo/partials/task.html' %}
+    {% endfor %}
+</div>
+

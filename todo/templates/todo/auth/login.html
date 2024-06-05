@@ -1,0 +1,50 @@
+{% extends 'todo/_base.html' %}
+
+{% block content %}
+    <div class="min-h-screen flex items-center sm:justify-center pt-6 sm:pt-0 bg-background">
+        <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-sm overflow-hidden sm:rounded-lg">
+            <form action="{% url 'todo:login' %}" method="POST" class="font-Mochyi">
+                {% csrf_token %}
+                <h3 class="text-4xl">Sign in</h3>
+                <p>Welcome back guy</p>
+
+                {% if success %}
+                    <span class="success mt-6 block w-full text-center bg-green-400 py-2 px-4 text-white rounded border-2 border-green-700">
+                    {{ success }}
+                    </span>
+                {% endif %}
+
+                {% if error %}
+                    <span class="error mt-6 block w-full text-center bg-red-400 py-2 px-4 text-white rounded border-2 border-red-700">
+                    {{ error }}
+                    </span>
+                {% endif %}
+
+                <div class="mt-6">
+                    <label for="id_for_email" class="block">Email</label>
+                    <input type="text" id="id_for_email" name="email"
+                           value="{% if form.email.value %} {{ form.email.value }} {% endif %}"
+                           class="w-full mt-1 focus:border-indigo-500 focus:ring-indigo-500 rounded-md border-2 border-checkbox">
+                </div>
+                {% if form.email.errors %}
+                    <ol>
+                        {% for error in form.email.errors %}
+                            <li class="text-[10px] text-red-500">{{ error }}</li>
+                        {% endfor %}
+
+                    </ol>
+                {% endif %}
+                <div class="mt-6">
+                    <label for="id_for_password" class="block">Password</label>
+                    <input type="password" id="id_for_password" name="password"
+                           class="w-full mt-1 focus:border-indigo-500 focus:ring-indigo-500 rounded-md border-2 border-checkbox">
+                </div>
+                <div class="mt-6 flex items-center justify-end gap-4">
+                    <p class="text-[12px]"><a href="{% url 'todo:register' %}" class="underline">Don't have an account
+                        ?</a></p>
+                    <button class="px-4 py-2 rounded uppercase text-[12px] bg-button text-white">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+<div class="todo-{{ task.id }} w-full mt-4 flex items-center justify-between gap-4 px-4 py-6 font-Mochyi text-[14px] rounded-md bg-white" hx-swap-oob="outerHTML">
+    <input type="checkbox" name="completed" {% if task.completed %} checked {% endif %}
+           class="completed-task w-[40px] h-[40px] rounded-md border-gray-300 hover:cursor-pointer"
+           data-task_id="{{ task.id }}">
+    <div class="flex items-center justify-between w-full">
+        <p class="title {% if task.completed %} line-through text-gray-400 {% endif %} transition duration-150 ease-in-out">{{ task.title }}</p>
+        <div class="relative">
+            <div class="peer transition duration-150 ease-in-out relative hover:cursor-pointer">
+                <label for="option-checkbox" class="hover:cursor-pointer">...</label>
+                <input type="checkbox" id="option-checkbox" class="absolute left-0 top-0 opacity-0">
+            </div>
+            <div class="absolute right-0 invisible peer-has-[:checked]:visible w-[200px] bg-white px-4 py-1 text-[12px] rounded-md shadow-md border-2 transition-all duration-150 ease-in-out">
+                <form hx-get="{% url 'todo:edit_task' task.id %}" hx-target=".todo-{{ task.id }}" hx-swap="outerHTML"
+                      class="w-full">
+                    <button type="submit" class="w-full text-left py-1">Edit</button>
+                </form>
+                <form hx-post="{% url 'todo:delete_task' task.id %}" hx-trigger='confirmed'
+                      class="w-full" onClick="Swal.fire({
+                      title: 'Are you sure?',
+                      text: 'You won\'t be able to revert this!',
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '#d33',
+                      confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        htmx.trigger(this, 'confirmed');
+                      }
+                    });" hx-target=".todo-{{ task.id }}" hx-swap="delete">
+                    {% csrf_token %}
+                    <button type="button" class="w-full text-left py-1">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
